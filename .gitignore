@@ -9,3 +9,4 @@ state/
 models/
 *.env
 backend-options*.json
+operator-evidence/

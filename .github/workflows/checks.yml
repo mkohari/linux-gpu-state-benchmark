@@ -21,3 +21,7 @@ jobs:
         run: |
           gpu-state-bench smoke --output runs/ci-smoke --state-root state
           python -c "import json; r=json.load(open('runs/ci-smoke/summary.json')); assert r['correctness_passed'] and not r['performance_run'] and r['median_ttft_speedup'] is None"
+      - name: Documented adapter contract check on the Linux filesystem target
+        run: |
+          gpu-state-bench check-backend --backend filesystem --device cpu --state-root state --output runs/ci-backend-contract
+          python -c "import json; r=json.load(open('runs/ci-backend-contract/backend-check.json')); assert r['correctness_passed'] and not r['transport_qualified'] and not r['performance_run']; assert len(r['writes']) == 3 and len(r['reads']) == 6"

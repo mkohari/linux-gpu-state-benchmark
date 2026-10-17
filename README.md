@@ -28,6 +28,11 @@ results from a different implementation. This initial revision has CPU
 correctness and Linux-I/O validation; a measured trained-model GPU result must
 be produced on the target machine before quoting a speedup.
 
+**Start with the [operator runbook](docs/RUNBOOK.md)** for exact setup, validation,
+measurement, interpretation and troubleshooting steps. Adapter authors should
+read the [package/interface walkthrough](docs/BACKENDS.md) and
+[S3/native GPU implementation recipes](docs/ADAPTER-RECIPES.md).
+
 ## Install on Linux
 
 Use Python 3.10+ and a CUDA-capable NVIDIA GPU/driver compatible with your PyTorch
@@ -143,6 +148,12 @@ Examples such as DDN native storage, AWS S3, MinIO or NetApp belong in separatel
 distributed adapter packages with their own dependencies and terms. No client
 implementation for any of them is included here. See
 [the external-backend contract](docs/BACKENDS.md).
+
+Before loading a model, an installed adapter can run `gpu-state-bench check-backend`
+with synthetic tensors. It tests multiple keys, exact bytes/shape/dtype, metadata,
+repeated reads and missing-object handling. Use CPU for a host-staged adapter or
+CUDA for a native GPU-only adapter. A passing check is state-correctness evidence,
+not a performance result or independent proof of the backend's network path.
 
 ## Distribution and provenance
 

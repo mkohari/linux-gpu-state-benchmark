@@ -31,6 +31,12 @@ def parser():
     s = subs.add_parser("smoke", help="Offline tiny random model; correctness only, never a performance claim")
     s.add_argument("--output", required=True, type=Path)
     s.add_argument("--state-root", required=True, type=Path)
+    c = subs.add_parser("check-backend", help="Check an installed adapter with synthetic tensors; no model or speedup claim")
+    c.add_argument("--backend", default="filesystem")
+    c.add_argument("--backend-options", type=Path)
+    c.add_argument("--state-root", required=True, type=Path)
+    c.add_argument("--output", required=True, type=Path)
+    c.add_argument("--device", default="cpu", help="cpu for host adapters, cuda:0 for native GPU-only adapters")
     r = subs.add_parser("report", help="Render a saved summary as HTML")
     r.add_argument("summary", type=Path)
     return p
@@ -45,6 +51,20 @@ def main():
         return
     if args.output.exists():
         p.error("Use a fresh output directory; existing results are never overwritten")
+    if args.command == "check-backend":
+        from .check_backend import check
+        options = json.loads(args.backend_options.read_text()) if args.backend_options else {}
+        if not isinstance(options, dict):
+            p.error("Backend options must be a JSON object")
+        args.state_root.mkdir(parents=True, exist_ok=True)
+        root = args.state_root / ("run-" + uuid.uuid4().hex)
+        print(json.dumps({"state_directory": str(root)}), flush=True)
+        backend, identity = load_backend(args.backend, root, options)
+        report = check(backend, args.device, args.output, identity)
+        print(json.dumps({"correctness_passed": report["correctness_passed"],
+            "transport_qualified": False, "performance_run": False,
+            "report": str(args.output / "backend-check.json"), "state_directory": str(root)}))
+        return
     import torch
     from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer, LlamaConfig, LlamaForCausalLM
     torch.manual_seed(9)
@@ -95,6 +115,7 @@ def main():
         if shutil.disk_usage(args.state_root).free < size * len(case_list) * 1.2:
             p.error("Insufficient free filesystem space for the declared KV corpus")
     root = args.state_root / ("run-" + uuid.uuid4().hex)
+    print(json.dumps({"state_directory": str(root)}), flush=True)
     backend, backend_identity = load_backend(spec, root, options)
     report = run(engine, backend, case_list, identity, args.output, repeats, new_tokens,
         seed=getattr(args, "order_seed", 1234), smoke=smoke, backend_identity=backend_identity)
