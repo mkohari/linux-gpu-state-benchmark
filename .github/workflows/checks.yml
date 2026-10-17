@@ -1,0 +1,23 @@
+name: Linux reference checks
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  linux-correctness:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install public CPU test dependencies
+        run: |
+          python -m pip install torch==2.9.0 --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -e '.[run]'
+      - name: Contracts, real Linux file purge, and actual model cache roundtrip
+        run: python -m unittest discover -s tests -v
+      - name: Offline smoke is never a GPU performance result
+        run: |
+          gpu-state-bench smoke --output runs/ci-smoke --state-root state
+          python -c "import json; r=json.load(open('runs/ci-smoke/summary.json')); assert r['correctness_passed'] and not r['performance_run'] and r['median_ttft_speedup'] is None"

@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "linux-gpu-state-benchmark"
+version = "0.1.0"
+description = "Compare GPU prefix recomputation with restoring model state from Linux files"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [{name = "Moiz Kohari"}]
+dependencies = []
+
+[project.optional-dependencies]
+run = ["torch==2.9.0", "transformers==4.57.1", "safetensors==0.6.2"]
+
+[project.scripts]
+gpu-state-bench = "gpu_state_bench.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

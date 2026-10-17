@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+build/
+dist/
+runs/
+state/
+models/
+*.env
+backend-options*.json
