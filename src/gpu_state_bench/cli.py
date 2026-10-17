@@ -13,6 +13,36 @@ from .runner import run, render_report
 def parser():
     p = argparse.ArgumentParser(description="Compare GPU prefix recomputation with saved KV state. No vendor SDK included.")
     subs = p.add_subparsers(dest="command", required=True)
+    from .onboarding import DEFAULT_MODEL
+    d = subs.add_parser("doctor", help="Explain setup problems and check the selected storage path")
+    d.add_argument("--state-root", type=Path, default=Path("state"))
+    d.add_argument("--cpu", action="store_true", help="Check readiness for the CPU demonstration")
+    download = subs.add_parser("download-model", help="Explicitly download the pinned public Qwen 1.5B model (~3 GiB)")
+    download.add_argument("--destination", type=Path, default=DEFAULT_MODEL)
+    for command, help_text in (("demo", "Small offline CPU demonstration of language and numerical state reuse"),
+                               ("start", "Run both real GPU experiments sequentially and build one results page")):
+        beginner = subs.add_parser(command, help=help_text)
+        beginner.add_argument("--output", type=Path, help="Fresh directory; a unique runs/ directory is generated if omitted")
+        beginner.add_argument("--state-root", type=Path, default=Path("state"))
+        beginner.add_argument("--model", type=Path, default=DEFAULT_MODEL)
+    n = subs.add_parser("mc", help="New synthetic Monte Carlo path-state recompute/restore/reprice experiment")
+    n.add_argument("--output", required=True, type=Path)
+    n.add_argument("--state-root", required=True, type=Path)
+    n.add_argument("--cpu-demo", action="store_true", help="Tiny CPU correctness fixture; no speedup claim")
+    n.add_argument("--device", default="cuda:0")
+    for name in ("paths", "steps", "scenarios", "repeats"):
+        n.add_argument("--" + name, type=int)
+    n.add_argument("--seed", type=int, default=20261017)
+    n.add_argument("--backend", default="filesystem")
+    n.add_argument("--backend-options", type=Path)
+    v = subs.add_parser("vllm-probe", help="Optional serving-only HTTP generation probe; no KV disk-restore comparison")
+    v.add_argument("--model", type=Path, default=DEFAULT_MODEL, help="Local tokenizer/model snapshot matching the server")
+    v.add_argument("--base-url", default="http://127.0.0.1:8000/v1")
+    v.add_argument("--output", required=True, type=Path)
+    v.add_argument("--contexts", type=int, default=2)
+    v.add_argument("--prefix-tokens", type=int, default=1024)
+    v.add_argument("--new-tokens", type=int, default=16)
+    v.add_argument("--repeats", type=int, default=3)
     m = subs.add_parser("run", help="Actual Linux/CUDA measurement, not a guaranteed speedup")
     m.add_argument("--model", required=True, type=Path, help="Existing local safetensors model/tokenizer snapshot")
     m.add_argument("--output", required=True, type=Path, help="Fresh results directory")
@@ -45,12 +75,62 @@ def parser():
 def main():
     p = parser()
     args = p.parse_args()
+    if args.command == "doctor":
+        from .onboarding import doctor
+        if not doctor(args.state_root, args.cpu)["ready"]:
+            p.exit(1, "Setup needs attention; follow the FIX messages above.\n")
+        return
+    if args.command == "download-model":
+        from .onboarding import download_model
+        download_model(args.destination)
+        return
+    if args.command in ("demo", "start"):
+        from .onboarding import guided
+        guided(args.output, args.state_root, args.model, cpu=args.command == "demo")
+        return
     if args.command == "report":
         report = json.loads(args.summary.read_text())
-        render_report(report, args.summary.with_name("report.html"))
+        renderer = render_report
+        if report.get("workload") == "synthetic-gbm-asian-call":
+            from .numerical import render_report as renderer
+        renderer(report, args.summary.with_name("report.html"))
         return
     if args.output.exists():
         p.error("Use a fresh output directory; existing results are never overwritten")
+    if args.command == "vllm-probe":
+        from .serving import probe
+        report = probe(args.base_url, args.model, args.output, args.contexts, args.prefix_tokens, args.new_tokens, args.repeats)
+        print(json.dumps({"completed": report["completed"], "filesystem_state_comparison": False,
+                          "report": str(args.output / "summary.json")}))
+        return
+    if args.command == "mc":
+        import torch
+        from .numerical import Simulation, run as run_numerical
+        torch.set_num_threads(1)
+        values = {name: getattr(args, name) for name in ("paths", "steps", "scenarios", "repeats") if getattr(args, name) is not None}
+        if args.cpu_demo:
+            values = {"paths": 512, "steps": 16, "scenarios": 2, "repeats": 1, **values}
+        config = Simulation(seed=args.seed, **values)
+        config.validate()
+        if not args.cpu_demo and (sys.platform != "linux" or not args.device.startswith("cuda") or not torch.cuda.is_available() or config.repeats < 3):
+            p.error("Monte Carlo performance measurements require Linux, CUDA and >=3 repeats; use --cpu-demo for correctness")
+        options = json.loads(args.backend_options.read_text()) if args.backend_options else {}
+        if not isinstance(options, dict):
+            p.error("Backend options must be a JSON object")
+        if args.backend == "filesystem":
+            options.setdefault("purged", sys.platform == "linux")
+            if not args.cpu_demo and options.get("purged") is not True:
+                p.error("GPU filesystem runs require purged I/O")
+        args.state_root.mkdir(parents=True, exist_ok=True)
+        if args.backend == "filesystem" and shutil.disk_usage(args.state_root).free < config.paths * config.steps * 8 * config.scenarios * 1.2:
+            p.error("Insufficient space for the numerical state corpus")
+        root = args.state_root / ("run-" + uuid.uuid4().hex)
+        print(json.dumps({"state_directory": str(root)}), flush=True)
+        backend, identity = load_backend(args.backend, root, options)
+        report = run_numerical(config, backend, identity, args.output, "cpu" if args.cpu_demo else args.device, args.cpu_demo)
+        print(json.dumps({"correctness_passed": report["correctness_passed"], "performance_run": report["performance_run"],
+                          "median_query_speedup": report["median_query_speedup"], "report": str(args.output / "report.html"), "state_directory": str(root)}))
+        return
     if args.command == "check-backend":
         from .check_backend import check
         options = json.loads(args.backend_options.read_text()) if args.backend_options else {}

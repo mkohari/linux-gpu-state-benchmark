@@ -15,6 +15,18 @@ packages are installed separately and are not vendored. Public technical referen
 - [safetensors tensor serialization API](https://huggingface.co/docs/safetensors/api/torch)
 - [Linux posix_fadvise](https://man7.org/linux/man-pages/man2/posix_fadvise.2.html)
 - [Linux mincore](https://man7.org/linux/man-pages/man2/mincore.2.html)
+- [PyTorch random generators](https://docs.pytorch.org/docs/2.9/generated/torch.Generator.html)
+- [Public Qwen2.5-1.5B-Instruct snapshot and license](https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct/tree/989aa7980e4cf806f80c7fef2b1adb7bc71aa306)
+- [Optional vLLM 0.11.0 server](https://docs.vllm.ai/en/v0.11.0/serving/openai_compatible_server.html)
+
+Version 0.2 adds newly written setup helpers, a synthetic GBM/Asian-call numerical
+experiment and an HTTP serving probe. The numerical equations use illustrative
+parameters and no imported equity dataset, calibration, Heston kernel or historical
+result. None of that source was copied from the earlier FSI benchmark. Optional
+vLLM is installed from its public distribution into a separate environment; no
+private serving patch or storage connector is included. The model helper is an
+explicit download, preserving the upstream model license; weights are never in
+the source distribution. Dependency and model licenses remain independent of MIT.
 
 The source distribution contains no model weights, vendor SDKs, client/plugin
 binaries, copied numerical kernel, commercial EULA, private model build unit,

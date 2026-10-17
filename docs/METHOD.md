@@ -1,5 +1,10 @@
 # Method and claim boundaries
 
+This document specifies the Transformers prefix-KV experiment (`run`/`smoke`).
+The new synthetic numerical experiment and sequential starter suite are defined
+in [WORKLOADS.md](WORKLOADS.md). The optional HTTP serving probe has its own
+[scope and timing definitions](OPTIONAL-VLLM.md); it does not measure KV disk restore.
+
 ## What prefill and saved state mean
 
 Prefill computes a model's intermediate attention key/value tensors for input

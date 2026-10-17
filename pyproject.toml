@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "linux-gpu-state-benchmark"
-version = "0.1.0"
-description = "Compare GPU prefix recomputation with restoring model state from Linux files"
+version = "0.2.0"
+description = "Guided Linux GPU language and Monte Carlo state-reuse experiments"
 requires-python = ">=3.10"
 license = "MIT"
 authors = [{name = "Moiz Kohari"}]

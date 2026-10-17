@@ -2,13 +2,49 @@
 
 **A new, vendor-neutral reference implementation by Moiz Kohari.** Compare the
 time to start a fresh answer after either recomputing a text prefix on a GPU or
-restoring its saved model KV state from a Linux filesystem.
+restoring its saved model KV state from a Linux filesystem. A separately authored
+synthetic Monte Carlo experiment makes the same comparison for simulated price paths.
 
 The only included storage backend is Linux filesystem I/O. There is **no DDN/FSI
-source, numerical kernel, vendor SDK, native plugin, cloud client, model weight,
+source, copied numerical kernel, vendor SDK, native plugin, cloud client, model weight,
 private build dependency, historical benchmark dataset or commercial EULA** in
 this repository. New source is MIT licensed. Public Python packages and separately
 obtained model weights remain subject to their own licenses.
+
+## New users: start here
+
+**[Beginner walkthrough: setup → demo → model → GPU tests → results](docs/GETTING-STARTED.md)**
+
+After cloning this repository, on Linux:
+
+```bash
+bash scripts/setup.sh
+source .venv/bin/activate
+gpu-state-bench demo              # No trained model needed; correctness only
+gpu-state-bench doctor            # Check GPU, dependencies and storage
+gpu-state-bench download-model    # Explicit ~3 GiB public model download
+gpu-state-bench start             # Both GPU experiments; one results page
+```
+
+For a machine without a GPU, use `bash scripts/setup.sh --cpu` then run `demo`.
+The setup installs public dependencies; it never changes the driver or stops
+another user's job. The model is pinned Qwen2.5-1.5B-Instruct, downloaded
+separately with its license. Neither model weights nor vendor code are in Git.
+
+| Included path | Purpose |
+|---|---|
+| `demo` | Offline tiny model + tiny Monte Carlo, CPU correctness only |
+| `start` | Real GPU prefix-state and numerical-state experiments, sequentially, with a combined results page |
+| `run` | Configurable Transformers KV recompute/restore comparison |
+| `mc` | New synthetic GBM/Asian-option path-state recompute/restore/reprice comparison |
+| `vllm-probe` | Optional HTTP generation exercise; **not** a KV filesystem comparison |
+
+Read [workload definitions](docs/WORKLOADS.md),
+[optional vLLM setup](docs/OPTIONAL-VLLM.md) and the
+[operator runbook](docs/RUNBOOK.md) for customization. These are new reference
+experiments, not the original concurrent FSI/RAG test. GPU speedups and optional
+vLLM compatibility still require validation on the target GPU; CPU CI is not
+evidence of either.
 
 ## The question
 
@@ -28,7 +64,7 @@ results from a different implementation. This initial revision has CPU
 correctness and Linux-I/O validation; a measured trained-model GPU result must
 be produced on the target machine before quoting a speedup.
 
-**Start with the [operator runbook](docs/RUNBOOK.md)** for exact setup, validation,
+Use the [operator runbook](docs/RUNBOOK.md) for detailed validation,
 measurement, interpretation and troubleshooting steps. Adapter authors should
 read the [package/interface walkthrough](docs/BACKENDS.md) and
 [S3/native GPU implementation recipes](docs/ADAPTER-RECIPES.md).
@@ -54,8 +90,9 @@ The reference integration pins PyTorch 2.9.0, Transformers 4.57.1 and safetensor
 0.6.2. It supports full-attention **Llama and Qwen2 model architectures** using
 the public DynamicCache interface. It does not support every model or serving
 stack. Sliding-window, hybrid, quantized and distributed caches need a separately
-validated engine. Models require their own access and license terms. Nothing in
-this repo downloads model weights or executes custom model-repository code.
+validated engine. Models require their own access and license terms. An ordinary
+run does not load from the network or execute custom model-repository code.
+Only the explicit `download-model` helper fetches the pinned public snapshot.
 
 ## Run a real GPU measurement
 
@@ -159,8 +196,10 @@ not a performance result or independent proof of the backend's network path.
 
 This is newly written source using public APIs. It does not copy the earlier
 mixed-workload benchmark or include its history, code, runtime images or results.
-It deliberately omits Monte Carlo, news RAG, serving orchestration and proprietary
-model compatibility patches. Read [PROVENANCE.md](PROVENANCE.md) and [LICENSE](LICENSE).
+The numerical simulation is newly authored synthetic GBM, not the earlier Heston
+kernel. News RAG, concurrent serving orchestration and proprietary model patches
+remain excluded. Optional vLLM uses public upstream packages in a separate
+environment. Read [PROVENANCE.md](PROVENANCE.md) and [LICENSE](LICENSE).
 
 MIT covers this source, not licenses for dependencies, model weights, storage
 services or separately installed adapters. The repository remains private until

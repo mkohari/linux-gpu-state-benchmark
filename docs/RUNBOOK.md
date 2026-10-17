@@ -29,7 +29,12 @@ applications or reserve a GPU. Record background load during each measurement.
 Obtain a local, authorized safetensors model/tokenizer snapshot separately. The
 engine supports full-attention Llama/Qwen2 in float16/bfloat16/float32. Arbitrary
 quantized, hybrid, sliding-window or distributed models require engine work.
-No models are downloaded and custom model-repository code is disabled.
+Run commands use local models and disable custom model-repository code. The
+explicit `download-model` helper can obtain the pinned public Qwen snapshot.
+New users should follow [GETTING-STARTED.md](GETTING-STARTED.md); separate
+[workload definitions](WORKLOADS.md) cover the new Monte Carlo experiment and
+[OPTIONAL-VLLM.md](OPTIONAL-VLLM.md) covers the isolated serving exercise. This
+runbook's detailed measurement steps below describe the reference prefix-KV path.
 
 The context window must fit **prefix + actual question suffix + output**. A
 2,048-token model cannot use the default 4,096-token prefix. Select a suitable

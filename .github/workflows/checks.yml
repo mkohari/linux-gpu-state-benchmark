@@ -5,16 +5,17 @@ permissions:
 jobs:
   linux-correctness:
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Install public CPU test dependencies
+      - name: Beginner CPU setup recipe on a clean Linux runner
         run: |
-          python -m pip install torch==2.9.0 --index-url https://download.pytorch.org/whl/cpu
-          python -m pip install -e '.[run]'
+          bash scripts/setup.sh --cpu
+          echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
+          bash -n scripts/setup.sh scripts/setup-vllm.sh scripts/start-vllm.sh
       - name: Contracts, real Linux file purge, and actual model cache roundtrip
         run: python -m unittest discover -s tests -v
       - name: Offline smoke is never a GPU performance result
@@ -25,3 +26,7 @@ jobs:
         run: |
           gpu-state-bench check-backend --backend filesystem --device cpu --state-root state --output runs/ci-backend-contract
           python -c "import json; r=json.load(open('runs/ci-backend-contract/backend-check.json')); assert r['correctness_passed'] and not r['transport_qualified'] and not r['performance_run']; assert len(r['writes']) == 3 and len(r['reads']) == 6"
+      - name: Beginner offline demo runs both workloads and produces a combined page
+        run: |
+          gpu-state-bench demo --output runs/ci-guided-demo --state-root state
+          python -c "import json,pathlib; p=pathlib.Path('runs/ci-guided-demo'); assert json.load(open(p/'suite.json'))['completed']; assert (p/'index.html').is_file(); r=json.load(open(p/'numerical/summary.json')); assert r['correctness_passed'] and not r['performance_run'] and r['median_query_speedup'] is None; assert r['total_measured_requests']==4"
