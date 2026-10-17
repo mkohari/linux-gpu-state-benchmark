@@ -115,7 +115,7 @@ class TensorAndModelIntegration(unittest.TestCase):
         from gpu_state_bench.cli import main
         from unittest.mock import patch
         with tempfile.TemporaryDirectory() as d:
-            output = Path(d) / "output"
+            output = Path(d) / "new-parent" / "output"
             with patch.object(sys, "argv", ["gpu-state-bench", "smoke", "--output", str(output), "--state-root", str(Path(d) / "state")]):
                 main()
             report = json.loads((output / "summary.json").read_text())

@@ -1,5 +1,6 @@
 """Matched request pairs, explicit state release, honest timing and correctness gates."""
 import gc
+from datetime import datetime, timezone
 import hashlib
 import html
 import json
@@ -93,7 +94,9 @@ def write_json(path, value):
 
 def run(engine, backend, case_list, model_identity, output, repeats, new_tokens, seed=1234, smoke=False, backend_identity=None):
     output = Path(output)
+    output.parent.mkdir(parents=True, exist_ok=True)
     output.mkdir(mode=0o700)
+    started_utc = datetime.now(timezone.utc).isoformat()
     write_json(output / "cases.json", case_list)
     if len(case_list) < 1 or repeats < 1 or new_tokens < 1:
         raise ValueError("Positive case/repeat/output-token counts are required")
@@ -153,8 +156,10 @@ def run(engine, backend, case_list, model_identity, output, repeats, new_tokens,
         reads = [r["storage_receipt"] for r in rows if r["mode"] == "restore"]
         writes = [r["write_receipt"] for r in population]
         report = {"schema": 1, "correctness_passed": True, "performance_run": not smoke,
+            "started_utc": started_utc, "completed_utc": datetime.now(timezone.utc).isoformat(),
             "scope": "Explicitly released prefix state; matched sequential single-request microbenchmark",
             "backend": description, "backend_source": backend_identity, "filesystem": filesystem,
+            "transport_qualification": "Core filesystem byte/purge checks" if description.get("name") == "filesystem" and not smoke else "External transport unqualified by core; smoke is correctness only",
             "summary": summary, "median_ttft_speedup": None if smoke else speedup,
             "contexts": len(case_list), "repeats": repeats, "new_tokens": new_tokens,
             "storage_totals": {"read_operations": len(reads), "write_operations": len(writes),
