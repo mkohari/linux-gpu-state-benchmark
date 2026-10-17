@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2026 Moiz Kohari
+# SPDX-License-Identifier: MIT
 """The sole included storage implementation: Linux files with temporary RAM staging."""
 import hashlib
 import json

@@ -128,15 +128,16 @@ build-backend = "setuptools.build_meta"
 name = "your-state-adapter"
 version = "0.1.0"
 requires-python = ">=3.10"
-dependencies = ["linux-gpu-state-benchmark==0.1.0"]
+dependencies = ["linux-gpu-state-benchmark==0.2.0"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
 ```
 
 Declare your adapter's own license and add its own required SDK dependencies in
-that project. Do not add them to the benchmark distribution. A reader needs
-repository access while this benchmark remains private.
+that project. Do not add them to the benchmark distribution. This benchmark's
+public source can be cloned without an access grant; install it locally first
+because it is not published on PyPI.
 
 In `adapter.py`, implement the class shown above. In its constructor call
 `super().__init__(root, options)` and create `self.root` with `mkdir(mode=0o700)`.

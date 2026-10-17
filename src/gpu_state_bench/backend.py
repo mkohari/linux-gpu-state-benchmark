@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2026 Moiz Kohari
+# SPDX-License-Identifier: MIT
 """A tensor-state interface for separately distributed backend implementations."""
 from abc import ABC, abstractmethod
 from dataclasses import dataclass

@@ -9,7 +9,14 @@ description = "Guided Linux GPU language and Monte Carlo state-reuse experiments
 requires-python = ">=3.10"
 license = "MIT"
 authors = [{name = "Moiz Kohari"}]
+maintainers = [{name = "Moiz Kohari"}]
 dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/mkohari/linux-gpu-state-benchmark"
+Repository = "https://github.com/mkohari/linux-gpu-state-benchmark"
+Documentation = "https://github.com/mkohari/linux-gpu-state-benchmark/blob/main/docs/GETTING-STARTED.md"
+Issues = "https://github.com/mkohari/linux-gpu-state-benchmark/issues"
 
 [project.optional-dependencies]
 run = ["torch==2.9.0", "transformers==4.57.1", "safetensors==0.6.2"]

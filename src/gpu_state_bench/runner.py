@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2026 Moiz Kohari
+# SPDX-License-Identifier: MIT
 """Matched request pairs, explicit state release, honest timing and correctness gates."""
 import gc
 from datetime import datetime, timezone

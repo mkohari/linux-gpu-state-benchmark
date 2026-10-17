@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2026 Moiz Kohari
+# SPDX-License-Identifier: MIT
 """Small, explicit setup helpers. No privileged changes or automatic GPU takeover."""
 from datetime import datetime, timezone
 import importlib.metadata

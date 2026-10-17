@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2026 Moiz Kohari
+# SPDX-License-Identifier: MIT
 import contextlib
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json

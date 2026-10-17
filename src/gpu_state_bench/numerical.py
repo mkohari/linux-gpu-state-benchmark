@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2026 Moiz Kohari
+# SPDX-License-Identifier: MIT
 """New synthetic GBM/Asian-option experiment; no historical FSI kernel or data."""
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone

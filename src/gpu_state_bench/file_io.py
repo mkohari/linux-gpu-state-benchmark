@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2026 Moiz Kohari
+# SPDX-License-Identifier: MIT
 """Owned regular files, synchronous completion and measured Linux page-cache purge."""
 import ctypes
 import json

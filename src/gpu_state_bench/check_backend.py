@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2026 Moiz Kohari
+# SPDX-License-Identifier: MIT
 """Exercise an installed backend without model weights or vendor-specific code."""
 from datetime import datetime, timezone
 import gc

@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2026 Moiz Kohari
+# SPDX-License-Identifier: MIT
 """Optional HTTP serving probe; never represented as a filesystem KV experiment."""
 import hashlib
 import json

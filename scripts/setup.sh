@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-FileCopyrightText: 2026 Moiz Kohari
+# SPDX-License-Identifier: MIT
 # Public dependencies only; no sudo, model download or GPU job is started here.
 set -euo pipefail
 mode="${1:---gpu}"

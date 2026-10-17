@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2026 Moiz Kohari
+# SPDX-License-Identifier: MIT
 """Public Transformers DynamicCache integration for full-attention Llama/Qwen2."""
 import hashlib
 import inspect

@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: "Please cite this software when publishing research or benchmark results that use it."
+type: software
+title: "Linux GPU State Benchmark"
+authors:
+  - family-names: "Kohari"
+    given-names: "Moiz"
+    website: "https://github.com/mkohari"
+version: "0.2.0"
+date-released: 2026-10-17
+url: "https://github.com/mkohari/linux-gpu-state-benchmark"
+repository-code: "https://github.com/mkohari/linux-gpu-state-benchmark"
+license: MIT
+abstract: >-
+  An independent Linux reference benchmark by Moiz Kohari comparing language-model
+  prefix recomputation with filesystem KV restoration, and synthetic Monte Carlo
+  price-path recomputation with stored-state restoration and repricing. Includes
+  guided setup, correctness checks and a separately scoped optional HTTP serving
+  probe. No fixed speedup or vendor performance is assumed.
+keywords:
+  - GPU
+  - KV cache
+  - Linux filesystem
+  - Monte Carlo
+  - state reuse
+  - reproducible benchmarks

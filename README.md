@@ -1,6 +1,9 @@
 # Linux GPU state benchmark
 
-**A new, vendor-neutral reference implementation by Moiz Kohari.** Compare the
+**Created, authored and maintained by [Moiz Kohari](https://github.com/mkohari).**
+Copyright © 2026 Moiz Kohari. Licensed under the [MIT License](LICENSE).
+
+A new, vendor-neutral reference implementation. Compare the
 time to start a fresh answer after either recomputing a text prefix on a GPU or
 restoring its saved model KV state from a Linux filesystem. A separately authored
 synthetic Monte Carlo experiment makes the same comparison for simulated price paths.
@@ -202,6 +205,20 @@ remain excluded. Optional vLLM uses public upstream packages in a separate
 environment. Read [PROVENANCE.md](PROVENANCE.md) and [LICENSE](LICENSE).
 
 MIT covers this source, not licenses for dependencies, model weights, storage
-services or separately installed adapters. The repository remains private until
-its owner chooses to change visibility; the source can be distributed under its
-included license. No particular hardware performance is guaranteed.
+services or separately installed adapters. This is a public open-source project;
+anyone can clone and use its original source under MIT. Keep its copyright and
+license notice when redistributing copies or substantial portions. No particular
+hardware performance is guaranteed.
+
+## Attribution and citation
+
+Original project author, copyright holder and maintainer: **Moiz Kohari**.
+Use [CITATION.cff](CITATION.cff) or GitHub's “Cite this repository” button when
+citing the project. Identify the commit, configuration and measured results when
+publishing a benchmark; a citation is not evidence of a particular speedup.
+
+MIT preserves the copyright/license notice in redistributed source or substantial
+portions; it does not require every use to include a paper citation, advertising
+credit or a backlink. Citation is requested for scholarly and benchmark reporting.
+Third-party packages and separately downloaded models retain their own authors,
+copyrights and licenses. See [AUTHORS.md](AUTHORS.md) and [PROVENANCE.md](PROVENANCE.md).

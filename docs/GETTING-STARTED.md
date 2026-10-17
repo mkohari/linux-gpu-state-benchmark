@@ -39,8 +39,9 @@ An optional, separate vLLM serving exercise is described at the end.
 - Internet access is needed to clone and install packages. The trained model is
   a separate explicit download, about 3 GiB. After setup and download the
   reference experiments use local files and need no internet.
-- This repository is private. Its owner must grant access before another person
-  can clone it; an authorized source ZIP works too. Do not distribute credentials.
+- This repository is public and MIT licensed. Cloning needs no GitHub account
+  or project access grant. A source ZIP works too. Model/service dependencies
+  remain subject to their own terms.
 
 ## Step 1 — Get the source
 
@@ -51,7 +52,7 @@ git clone https://github.com/mkohari/linux-gpu-state-benchmark.git
 cd linux-gpu-state-benchmark
 ```
 
-GitHub may ask you to authenticate using your own account. For a ZIP, extract it,
+Public HTTPS cloning requires no GitHub authentication. For a ZIP, extract it,
 open a terminal in the extracted project folder, and continue below.
 
 ## Step 2 — Install the reference environment
@@ -226,7 +227,7 @@ speedup experiment. Do not run it at the same time on the same GPU as `start`.
 
 | Problem | Next step |
 |---|---|
-| GitHub denies access | Ask the owner for repository access or an authorized source ZIP |
+| GitHub clone fails | Check the public URL and network/proxy access, or use GitHub's source ZIP download |
 | Python/venv not found | Install Python 3.12 and its venv package through your normal administrator process |
 | CUDA unavailable | Check the NVIDIA driver; ensure setup was run without `--cpu`; rerun `doctor` |
 | Download stopped | Repeat `download-model`; do not delete an unrelated model folder |
